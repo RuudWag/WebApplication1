@@ -1,0 +1,7 @@
+
+*.dll
+.vs/WebApplication1/v15/.suo
+*.dll
+*.pdb
+*.cache
+*.out
