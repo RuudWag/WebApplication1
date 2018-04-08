@@ -5,3 +5,7 @@
 *.pdb
 *.cache
 *.out
+*.dll
+*.pdb
+*.out
+*.dll
