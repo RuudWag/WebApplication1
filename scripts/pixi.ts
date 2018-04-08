@@ -26,7 +26,7 @@ loader
 
 //This `setup` function will run when the image has loaded
 var cat;
-
+ 
 function setup() {
    
     //Create the cat sprite
