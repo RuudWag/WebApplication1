@@ -26,15 +26,10 @@ loader
     .add("images/cat.png")
     .load(setup);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 //This `setup` function will run when the image has loaded
 var cat;
- 
 
-=======
-=======
->>>>>>> c4be6224bd4d55cb3a6ccb1912ddc3874c5add63
 function keyboard(keyCode) {
     let key = <any>{};
     key.code = keyCode;
@@ -76,10 +71,7 @@ function keyboard(keyCode) {
 //Define any variables that are used in more than one function
 let cats: any = new PIXI.particles.ParticleContainer();
 let state;
-<<<<<<< HEAD
->>>>>>> c4be6224bd4d55cb3a6ccb1912ddc3874c5add63
-=======
->>>>>>> c4be6224bd4d55cb3a6ccb1912ddc3874c5add63
+
 function setup() {
     let xpos: number = 0;
     let ypos: number = 0;

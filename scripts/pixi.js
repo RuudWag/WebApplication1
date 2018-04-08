@@ -16,6 +16,8 @@ document.body.appendChild(app.view);
 loader
     .add("images/cat.png")
     .load(setup);
+//This `setup` function will run when the image has loaded
+var cat;
 function keyboard(keyCode) {
     let key = {};
     key.code = keyCode;
