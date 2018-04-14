@@ -52,71 +52,75 @@ function keyboard(keyCode) {
 }
 //Define any variables that are used in more than one function
 let snake = new PIXI.particles.ParticleContainer();
-let snakeLeft = new PIXI.particles.ParticleContainer();
+let snakeLeft = new PIXI.particles.ParticleContainer(1000000);
 let state;
 let prevpointx = 500;
 let prevpointy = 500;
+let vx = 0;
+let vy = 0;
 let circle = new PIXI.Graphics();
 circle.beginFill(0x9966FF);
-circle.drawCircle(0, 0, 32);
+circle.drawCircle(0, 0, 8);
 circle.endFill();
 let texture = app.renderer.generateTexture(circle);
+let texture2 = app.renderer.generateTexture(circle);
 function setup() {
-    let xpos = 0;
-    let ypos = 0;
     let sprite = new PIXI.Sprite(texture);
-    sprite.x = 500;
-    sprite.y = 500;
+    snake.x = 500;
+    snake.y = 500;
     snake.addChild(sprite);
     //Create the `cat` sprite 
-    snake.vx = 0;
-    snake.vy = 0;
+    let sprite2 = new PIXI.Sprite(texture);
+    snakeLeft.x = 500;
+    snakeLeft.y = 500;
+    snakeLeft.addChild(sprite2);
     app.stage.addChild(snake);
+    app.stage.addChild(snakeLeft);
     //Capture the keyboard arrow keys
     let left = keyboard(37), up = keyboard(38), right = keyboard(39), down = keyboard(40);
     //Left arrow key `press` method
     left.press = () => {
         //Change the cat's velocity when the key is pressed
-        snake.vx = -5;
-        snake.vy = 0;
+        vx = 5;
+        vy = 0;
     };
     //Left arrow key `release` method
     left.release = () => {
         //If the left arrow has been released, and the right arrow isn't down,
         //and the cat isn't moving vertically:
         //Stop the cat
-        if (!right.isDown && snake.vy === 0) {
-            snake.vx = 0;
+        if (!right.isDown && vy === 0) {
+            vx = 0;
         }
     };
     //Up
     up.press = () => {
-        snake.vy = -5;
-        snake.vx = 0;
+        vy = 5;
+        vx = 0;
     };
     up.release = () => {
-        if (!down.isDown && snake.vx === 0) {
-            snake.vy = 0;
+        if (!down.isDown && vx === 0) {
+            vy = 0;
         }
     };
     //Right
     right.press = () => {
-        snake.vx = 5;
-        snake.vy = 0;
+        vx = -5;
+        vy = 0;
     };
     right.release = () => {
-        if (!left.isDown && snake.vy === 0) {
-            snake.vx = 0;
+        if (!left.isDown && vy === 0) {
+            vx = 0;
         }
     };
     //Down
     down.press = () => {
-        snake.vy = 5;
-        snake.vx = 0;
+        vy = -5;
+        vx = 0;
     };
     down.release = () => {
-        if (!up.isDown && snake.vx === 0) {
-            snake.vy = 0;
+        if (!up.isDown && vx === 0) {
+            vy = 0;
         }
     };
     //Set the game state
@@ -130,15 +134,24 @@ function gameLoop(delta) {
 }
 function play(delta) {
     //Use the cat's velocity to make it move
-    snake.x += snake.vx;
-    snake.y += snake.vy;
-    if (Math.sqrt((snake.x - prevpointx) * (snake.x - prevpointx) + (snake.y - prevpointy) * (snake.y - prevpointy)) >= 32) {
+    //snake.x += vx;
+    //snake.y += vy
+    let Global_x = snake.getGlobalPosition().x;
+    let Global_y = snake.getGlobalPosition().y;
+    snakeLeft.x += vx;
+    snakeLeft.y += vy;
+    prevpointx += vx;
+    prevpointy += vy;
+    if (Math.sqrt((prevpointx * prevpointx) + (prevpointy * prevpointy)) >= 10) {
         let sprite = new PIXI.Sprite(texture);
-        sprite.x = snake.x;
-        sprite.y = snake.y;
+        sprite.x = 500 - snakeLeft.x;
+        sprite.y = 500 - snakeLeft.y;
         snakeLeft.addChild(sprite);
-        prevpointx = snake.x;
-        prevpointy = snake.y;
+        prevpointx = 0;
+        prevpointy = 0;
+    }
+    if (snakeLeft.x > 1000) {
+        snakeLeft.visible = false;
     }
 }
 //# sourceMappingURL=pixi.js.map
