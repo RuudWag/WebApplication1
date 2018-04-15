@@ -56,6 +56,10 @@ let snakeLeft = new PIXI.particles.ParticleContainer(1000000);
 let state;
 let prevpointx = 500;
 let prevpointy = 500;
+let current_angle = 0;
+let angle_delta = 5;
+let NewAngle = 0;
+let speed_snake = 3;
 let vx = 0;
 let vy = 0;
 let circle = new PIXI.Graphics();
@@ -81,46 +85,24 @@ function setup() {
     //Left arrow key `press` method
     left.press = () => {
         //Change the cat's velocity when the key is pressed
-        vx = 5;
-        vy = 0;
+        NewAngle = -1;
     };
     //Left arrow key `release` method
     left.release = () => {
         //If the left arrow has been released, and the right arrow isn't down,
         //and the cat isn't moving vertically:
         //Stop the cat
-        if (!right.isDown && vy === 0) {
-            vx = 0;
-        }
-    };
-    //Up
-    up.press = () => {
-        vy = 5;
-        vx = 0;
-    };
-    up.release = () => {
-        if (!down.isDown && vx === 0) {
-            vy = 0;
+        if (!right.isDown) {
+            NewAngle = 0;
         }
     };
     //Right
     right.press = () => {
-        vx = -5;
-        vy = 0;
+        NewAngle = 1;
     };
     right.release = () => {
-        if (!left.isDown && vy === 0) {
-            vx = 0;
-        }
-    };
-    //Down
-    down.press = () => {
-        vy = -5;
-        vx = 0;
-    };
-    down.release = () => {
-        if (!up.isDown && vx === 0) {
-            vy = 0;
+        if (!left.isDown) {
+            NewAngle = 0;
         }
     };
     //Set the game state
@@ -136,6 +118,15 @@ function play(delta) {
     //Use the cat's velocity to make it move
     //snake.x += vx;
     //snake.y += vy
+    current_angle += NewAngle * angle_delta;
+    if (current_angle > 360) {
+        current_angle -= 360;
+    }
+    if (current_angle < 0) {
+        current_angle += 360;
+    }
+    vx = speed_snake * Math.sin((current_angle + 90) * Math.PI / 180);
+    vy = speed_snake * Math.sin(current_angle * Math.PI / 180);
     let Global_x = snake.getGlobalPosition().x;
     let Global_y = snake.getGlobalPosition().y;
     snakeLeft.x += vx;
