@@ -78,6 +78,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="scripts\keyboard.ts" />
+    <TypeScriptCompile Include="scripts\rendersnake.ts" />
+    <TypeScriptCompile Include="scripts\snake.ts" />
     <TypeScriptCompile Include="scripts\pixi.ts" />
     <TypeScriptCompile Include="typings\pixi.js.d.ts" />
   </ItemGroup>
