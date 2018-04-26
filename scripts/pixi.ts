@@ -1,6 +1,7 @@
 ﻿/// <reference path="snake.ts" />
 /// <reference path="../typings/pixi.js.d.ts" />
 /// <reference path="keyboard.ts" />
+/// <reference path="collision.ts" />
 
 //import { Container } from "pixi.js";
 
@@ -19,6 +20,10 @@ let app = new Application({
     resolution: 1
 }
 );
+
+let pointBase = new Point(0, 0);
+let squareBase = new square(pointBase, 20000);
+let quadTreeBase = new Quadtree(squareBase)
 
 document.body.appendChild(app.view);
 
