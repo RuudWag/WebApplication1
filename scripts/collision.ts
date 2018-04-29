@@ -73,6 +73,19 @@ class Quadtree {
         this.hasSubTrees = false;
         this.points = new Array<Point>();
         this.capacity = 4;
+
+       /* var graphics = new PIXI.Graphics();
+
+        graphics.beginFill(0xFFFF00);
+
+        // set the line style to have a width of 5 and set the color to red
+        graphics.lineStyle(5, 0xFF0000);
+
+        // draw a rectangle
+        graphics.drawRect(this.boundary.center.x - this.boundary.halfDimension, this.boundary.center.y - this.boundary.halfDimension, this.boundary.halfDimension * 4, this.boundary.halfDimension*4);
+
+        renderSnake.boundary.addChild(graphics);*/
+
     }
 
     insertPoint(point: Point): boolean {
@@ -142,6 +155,24 @@ class Quadtree {
             }
         }
         return false;
+    }
+
+    updateCollision(snake: Snake) { 
+       
+        for (let i = 0; i < 100; i++) {
+            if (quadTreeBase.haveCollision(snake.snakeHead)) {
+                snake.speed = 0.001;
+            }
+        }
+        let i = snake.new_collision_circles.length;
+        while (i--) {
+            let distanceBetweenCircles = Math.sqrt(Math.pow(snake.new_collision_circles[i].center.x - snake.snakeHead.center.x, 2) + Math.pow(snake.new_collision_circles[i].center.y - snake.snakeHead.center.y, 2))
+            if (distanceBetweenCircles >= snake.snakeHead.radius * 2) {
+                quadTreeBase.insertPoint(snake.new_collision_circles[i].center)
+                snake.new_collision_circles.splice(i, 1);
+                return true;
+            }
+        }
     }
 
 

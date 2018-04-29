@@ -1,63 +1,57 @@
 class RenderSnake {
     constructor(app) {
         this.currentindex = 0;
-        this.distance = 0;
         this.app = app;
         this.center_circles = new PIXI.particles.ParticleContainer();
         this.static_circles = new PIXI.particles.ParticleContainer(1000000);
+        this.boundary = new PIXI.particles.ParticleContainer();
         let circle = new PIXI.Graphics();
         circle.beginFill(0x9966FF);
         circle.drawCircle(0, 0, 8);
         circle.endFill();
         this.texture = this.app.renderer.generateTexture(circle);
         let sprite = new PIXI.Sprite(this.texture);
+        this.center_circles.x = app.screen.width / 2;
+        this.center_circles.y = app.screen.height / 2;
+        this.center_circles.addChild(sprite);
         this.app.stage.addChild(this.static_circles);
+        this.app.stage.addChild(this.center_circles);
+        let boundaries = new PIXI.Graphics();
+        boundaries.lineStyle(5, 0xFF0000);
+        boundaries.drawRect(2000, 2000, 1000, 1000);
+        let boundarytexture = this.app.renderer.generateTexture(boundaries);
+        let boundarysprit = new PIXI.Sprite(boundarytexture);
+        this.boundary.addChild(boundarysprit);
+        // draw a rectangle
+        this.app.stage.addChild(this.boundary);
+        console.log(app.screen.width);
+        console.log(app.screen.height);
     }
     UpdateRender(snake) {
-        this.static_circles.x = snake.x;
-        this.static_circles.y = snake.y;
-        this.distance += 1;
-        if (this.distance >= 10) {
+        this.static_circles.x = snake.snakeHead.center.x;
+        this.static_circles.y = snake.snakeHead.center.y;
+        this.boundary.x = snake.snakeHead.center.x;
+        this.boundary.y = snake.snakeHead.center.y;
+        for (let i = 0; i < snake.new_render_circles.length; i++) {
+            let x = app.screen.width / 2 - snake.new_render_circles[i].center.x;
+            let y = app.screen.height / 2 - snake.new_render_circles[i].center.y;
             if (this.static_circles.children.length < snake.length) {
                 let sprite = new PIXI.Sprite(this.texture);
-                sprite.x = 500 - this.static_circles.x;
-                sprite.y = 500 - this.static_circles.y;
+                sprite.x = x;
+                sprite.y = y;
                 this.static_circles.addChild(sprite);
-                console.time('someFunction');
-                let newPoint = new Point(sprite.x, sprite.y);
-                let newCircle = new Circle(newPoint, 8);
-                for (let i = 0; i < 100; i++) {
-                    if (quadTreeBase.haveCollision(newCircle)) {
-                        snake.speed = 0.001;
-                        //console.log("hit")
-                    }
-                }
-                quadTreeBase.insertPoint(newPoint);
-                console.timeEnd('someFunction');
-                //console.log("x: " + sprite.x);
-                //console.log("y: " + sprite.y);
             }
             else {
                 if (snake.length <= this.currentindex) {
                     this.currentindex = 0;
                 }
-                this.static_circles.getChildAt(this.currentindex).x = 500 - this.static_circles.x;
-                this.static_circles.getChildAt(this.currentindex).y = 500 - this.static_circles.y;
-                console.time('someFunction');
-                let newPoint = new Point(this.static_circles.x, 500 - this.static_circles.y);
-                let newCircle = new Circle(newPoint, 8);
-                for (let i = 0; i < 100; i++) {
-                    if (quadTreeBase.haveCollision(newCircle)) {
-                        snake.speed = 0.001;
-                        //console.log("hit")
-                    }
-                }
-                quadTreeBase.insertPoint(newPoint);
-                console.timeEnd('someFunction');
+                let change_sprite = this.static_circles.getChildAt(this.currentindex);
+                change_sprite.x = x;
+                change_sprite.y = y;
             }
-            this.distance = 0;
             this.currentindex++;
         }
+        snake.new_render_circles = [];
     }
 }
 //# sourceMappingURL=rendersnake.js.map
