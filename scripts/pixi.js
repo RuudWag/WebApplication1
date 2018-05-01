@@ -13,13 +13,15 @@ let app = new Application({
     transparent: false,
     resolution: 1
 });
+let play_field_width = 3000;
+let play_field_height = 3000;
+let pointBase = new Point(play_field_width / 2, play_field_height / 2);
+let squareBase = new square(pointBase, Math.min(play_field_height, play_field_width) / 2);
 document.body.appendChild(app.view);
-let snake = new Snake();
+let snake = new Snake(squareBase);
 let renderSnake = new RenderSnake(app);
 new Keyboard(snake);
-let pointBase = new Point(0, 0);
-let squareBase = new square(pointBase, 500);
-let quadTreeBase = new Quadtree(squareBase);
+let quadTreeBase = new Quadtree(squareBase, 0);
 app.ticker.add(delta => gameLoop(delta));
 loader.load(setup);
 function setup() {
@@ -28,14 +30,14 @@ function setup() {
     //Start the game loop 
 }
 function gameLoop(delta) {
-    console.time("update");
+    //console.time("update");
     snake.UpdateDirections();
-    console.timeEnd("update");
-    console.time("collision");
+    //console.timeEnd("update");
+    //console.time("collision");
     quadTreeBase.updateCollision(snake);
-    console.timeEnd("collision");
-    console.time("Render");
+    //console.timeEnd("collision");
+    //console.time("Render")
     renderSnake.UpdateRender(snake);
-    console.timeEnd("Render");
+    //console.timeEnd("Render")
 }
 //# sourceMappingURL=pixi.js.map

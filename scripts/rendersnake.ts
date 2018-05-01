@@ -3,14 +3,14 @@
     center_circles: PIXI.particles.ParticleContainer;
     app: PIXI.Application;
     texture: PIXI.RenderTexture;
-    boundary: PIXI.particles.ParticleContainer;
+    boundary: PIXI.Container;
     currentindex: number = 0;
 
     constructor(app: PIXI.Application) {
         this.app = app;   
         this.center_circles = new PIXI.particles.ParticleContainer();
         this.static_circles = new PIXI.particles.ParticleContainer(1000000);
-        this.boundary = new PIXI.particles.ParticleContainer();
+        this.boundary = new PIXI.Container();
         let circle = new PIXI.Graphics();
         circle.beginFill(0x9966FF);
         circle.drawCircle(0, 0, 8);
@@ -26,14 +26,15 @@
 
 
         let boundaries = new PIXI.Graphics();
-
   
         boundaries.lineStyle(5, 0xFF0000);
-        boundaries.drawRect(2000, 2000, 1000, 1000);
+        boundaries.drawRect(0, 0, 1000, 1000);
+        boundaries.x -= 0;
+        boundaries.y -= 0;
     
         let boundarytexture = this.app.renderer.generateTexture(boundaries);
         let boundarysprit = new PIXI.Sprite(boundarytexture);
-        this.boundary.addChild(boundarysprit);
+        this.boundary.addChild(boundaries);
         // draw a rectangle
         
 
@@ -46,7 +47,7 @@
     UpdateRender(snake: Snake): void {
         this.static_circles.x = snake.snakeHead.center.x;
         this.static_circles.y = snake.snakeHead.center.y;
-
+        console.log("x: " + snake.snakeHead.center.x + " y: " + snake.snakeHead.center.y);
         this.boundary.x = snake.snakeHead.center.x
         this.boundary.y = snake.snakeHead.center.y
 

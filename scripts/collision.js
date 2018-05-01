@@ -44,22 +44,24 @@ class square {
     }
 }
 class Quadtree {
-    constructor(boundary) {
+    constructor(boundary, depth) {
         this.boundary = boundary;
         this.hasSubTrees = false;
         this.points = new Array();
         this.capacity = 4;
-        /* var graphics = new PIXI.Graphics();
- 
-         graphics.beginFill(0xFFFF00);
- 
-         // set the line style to have a width of 5 and set the color to red
-         graphics.lineStyle(5, 0xFF0000);
- 
-         // draw a rectangle
-         graphics.drawRect(this.boundary.center.x - this.boundary.halfDimension, this.boundary.center.y - this.boundary.halfDimension, this.boundary.halfDimension * 4, this.boundary.halfDimension*4);
- 
-         renderSnake.boundary.addChild(graphics);*/
+        this.depth = depth;
+        if (this.depth < 300) {
+            let boundaries = new PIXI.Graphics();
+            boundaries.lineStyle(3, 0xFFFF00);
+            boundaries.drawRect(0, 0, this.boundary.halfDimension * 2, this.boundary.halfDimension * 2);
+            let multiplier = 0;
+            for (let i = 0; i < this.depth; i++) {
+                multiplier = multiplier * 2 + 1;
+            }
+            boundaries.x = multiplier * this.boundary.halfDimension - this.boundary.center.x - 1000;
+            boundaries.y = multiplier * this.boundary.halfDimension - this.boundary.center.y - 1000;
+            renderSnake.boundary.addChild(boundaries);
+        }
     }
     insertPoint(point) {
         if (!this.boundary.containsPoint(point)) {
@@ -73,10 +75,10 @@ class Quadtree {
             let quarterDimension = this.boundary.halfDimension / 2;
             let x = this.boundary.center.x;
             let y = this.boundary.center.y;
-            this.northWest = new Quadtree(new square(new Point(x - quarterDimension, y - quarterDimension), quarterDimension));
-            this.northEast = new Quadtree(new square(new Point(x + quarterDimension, y - quarterDimension), quarterDimension));
-            this.southWest = new Quadtree(new square(new Point(x - quarterDimension, y + quarterDimension), quarterDimension));
-            this.southEast = new Quadtree(new square(new Point(x + quarterDimension, y + quarterDimension), quarterDimension));
+            this.northWest = new Quadtree(new square(new Point(x - quarterDimension, y - quarterDimension), quarterDimension), this.depth + 1);
+            this.northEast = new Quadtree(new square(new Point(x + quarterDimension, y - quarterDimension), quarterDimension), this.depth + 1);
+            this.southWest = new Quadtree(new square(new Point(x - quarterDimension, y + quarterDimension), quarterDimension), this.depth + 1);
+            this.southEast = new Quadtree(new square(new Point(x + quarterDimension, y + quarterDimension), quarterDimension), this.depth + 1);
             this.hasSubTrees = true;
         }
         if (this.northWest.insertPoint(point)) {
@@ -122,7 +124,7 @@ class Quadtree {
     updateCollision(snake) {
         for (let i = 0; i < 100; i++) {
             if (quadTreeBase.haveCollision(snake.snakeHead)) {
-                snake.speed = 0.001;
+                snake.speed = 1;
             }
         }
         let i = snake.new_collision_circles.length;
