@@ -32,6 +32,7 @@ class Keyboard {
     constructor(snake) {
         this.left = new Key(37);
         this.right = new Key(39);
+        this.up = new Key(38);
         //Left 
         this.left.press = () => {
             snake.direction = -1;
@@ -49,6 +50,13 @@ class Keyboard {
             if (!this.left.isDown) {
                 snake.direction = 0;
             }
+        };
+        //Up
+        this.up.press = () => {
+            snake.jump = true;
+        };
+        this.up.release = () => {
+            snake.jump = false;
         };
     }
 }

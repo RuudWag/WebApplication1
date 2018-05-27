@@ -14,6 +14,12 @@ class Circle {
         this.center = center;
         this.radius = radius;
     }
+    insertsectsWithCircle(oter_circle: Circle): boolean {
+        let distanceBetweenCircles = Math.sqrt(Math.pow(this.center.x - oter_circle.center.x, 2) + Math.pow(this.center.y - oter_circle.center.y, 2))
+        if (distanceBetweenCircles < this.radius + oter_circle.radius) {
+            return true;
+        }
+    }
 
 }
 
@@ -24,11 +30,14 @@ class square {
         this.center = center;
         this.halfDimension = halfDimension;
     }
-    containsPoint(point: Point): boolean {
-        if (this.center.x - this.halfDimension <= point.x
-            && this.center.x + this.halfDimension >= point.x
-            && this.center.y - this.halfDimension <= point.y
-            && this.center.y + this.halfDimension >= point.y) {
+    CircleInSquare(circle: Circle): boolean {
+
+
+        let radius = circle.radius;
+        if (this.center.x - this.halfDimension <= circle.center.x - radius
+            && this.center.x + this.halfDimension >= circle.center.x + radius
+            && this.center.y - this.halfDimension <= circle.center.y - radius
+            && this.center.y + this.halfDimension >= circle.center.y + radius) {
             return true;
         }
         return false;    
@@ -60,9 +69,9 @@ class square {
 class Quadtree {
     capacity: number;
     boundary: square;
-    points: Array<Point>
+    circles: Array<Circle>
     hasSubTrees: boolean
-    depth: number;
+    depth: number = 0;
     northWest: Quadtree;
     northEast: Quadtree;
     southWest: Quadtree;
@@ -72,11 +81,11 @@ class Quadtree {
         
         this.boundary = boundary;
         this.hasSubTrees = false;
-        this.points = new Array<Point>();
+        this.circles = new Array<Circle>();
         this.capacity = 4;
 
         this.depth = depth;
-        if (this.depth < 300) {
+        /*if (this.depth < 300) {
             let boundaries = new PIXI.Graphics();
 
             boundaries.lineStyle(3, 0xFFFF00);
@@ -85,20 +94,20 @@ class Quadtree {
             for (let i = 0; i < this.depth; i++) {
                 multiplier = multiplier * 2 + 1
             }
-            boundaries.x = multiplier * this.boundary.halfDimension - this.boundary.center.x - 1000;
-            boundaries.y = multiplier * this.boundary.halfDimension - this.boundary.center.y - 1000;
+            boundaries.x = this.boundary.center.x - this.boundary.halfDimension;
+            boundaries.y = this.boundary.center.y -this.boundary.halfDimension;
             renderSnake.boundary.addChild(boundaries);
-        }
+        }*/
 
     }
 
-    insertPoint(point: Point): boolean {
-        if (!this.boundary.containsPoint(point)) {
+    insertCircle(circle: Circle): boolean {
+        if (!this.boundary.CircleInSquare(circle)) {
             return false;
         }
 
-        if (this.points.length < this.capacity) {
-            this.points.push(point);
+        if (this.circles.length < this.capacity) {
+            this.circles.push(circle);
             return true;
         }
 
@@ -113,70 +122,105 @@ class Quadtree {
             this.hasSubTrees = true;
         }
 
-        if (this.northWest.insertPoint(point)) {
+        if (this.northWest.insertCircle(circle)) {
             return true;
         }
-        if (this.northEast.insertPoint(point)) {
+        if (this.northEast.insertCircle(circle)) {
             return true;
         }
-        if (this.southWest.insertPoint(point)) {
+        if (this.southWest.insertCircle(circle)) {
             return true;
         }
-        if (this.southEast.insertPoint(point)) {
+        if (this.southEast.insertCircle(circle)) {
             return true;
         }
 
-
-        console.log("should not be here")
+        this.circles.push(circle);
+        return true;
     }
 
-    haveCollision(circle: Circle): boolean {
-
-
-        if (!this.boundary.containsCircle(circle) || this.points.length==0) {
+    removepoint(circle: Circle): boolean {
+        if (!this.boundary.containsCircle(circle)) {
             return false;
         }
 
-        for (let point of this.points)
-        {
-            let distanceBetweenCircles = Math.sqrt(Math.pow(circle.center.x - point.x, 2) + Math.pow(circle.center.y - point.y, 2))
-            if (distanceBetweenCircles < circle.radius * 2) {
+        for (let i = 0; i < this.circles.length; i++) {
+            if (circle.center.x == this.circles[i].center.x && circle.center.y == this.circles[i].center.y) {
+                this.circles.splice(i, 1);
                 return true;
+            }
+        }
+
+        if (this.hasSubTrees) {
+            if (this.northWest.removepoint(circle)) {
+                return true;
+            }
+            if (this.northEast.removepoint(circle)) {
+                return true;
+            }
+            if (this.southWest.removepoint(circle)) {
+                return true;
+            }
+            if (this.southEast.removepoint(circle)) {
+                return true;
+            }
+        }
+    }
+
+    haveCollision(check_circle: Circle, collision_circles: Array<Circle>): void {
+
+
+        if (!this.boundary.containsCircle(check_circle) ) {
+            return;
+        }
+
+        for (let circle of this.circles)
+        {
+            let distanceBetweenCircles = Math.sqrt(Math.pow(check_circle.center.x - circle.center.x, 2) + Math.pow(check_circle.center.y - circle.center.y, 2))
+            if (distanceBetweenCircles < check_circle.radius + circle.radius) {
+                collision_circles.push(circle);
             }
         }
         if (this.hasSubTrees) {
-            if (this.northWest.haveCollision(circle)) {
-                return true;
-            }
-            if (this.northEast.haveCollision(circle)) {
-                return true;
-            }
-            if (this.southWest.haveCollision(circle)) {
-                return true;
-            }
-            if (this.southEast.haveCollision(circle)) {
-                return true;
-            }
+            this.northWest.haveCollision(check_circle, collision_circles)
+             
+            this.northEast.haveCollision(check_circle, collision_circles)
+            
+            this.southWest.haveCollision(check_circle, collision_circles)
+             
+            this.southEast.haveCollision(check_circle, collision_circles)               
         }
-        return false;
     }
 
     updateCollision(snake: Snake) { 
-       
-        for (let i = 0; i < 100; i++) {
-            if (quadTreeBase.haveCollision(snake.snakeHead)) {
-                snake.speed = 1;
+
+        for (let i = 0; i < snake.bodies_for_collision.length; i++) {
+            let snake_body = snake.body[snake.bodies_for_collision[i]];
+            if (snake_body.old_circle) {
+                if (!quadTreeBase.removepoint(snake_body.old_circle)) {
+                    console.log("removing failed, should not happen");
+                }
+            }
+            if (snake_body.new_circle) {
+                quadTreeBase.insertCircle(snake_body.new_circle);
+
+                let collision_points: Array<Circle> = [];
+                quadTreeBase.haveCollision(snake_body.new_circle, collision_points)
+                if (collision_points.length != snake_body.not_to_check_against.length) {
+                    snake.speed = 1;
+                }
             }
         }
-        let i = snake.new_collision_circles.length;
-        while (i--) {
-            let distanceBetweenCircles = Math.sqrt(Math.pow(snake.new_collision_circles[i].center.x - snake.snakeHead.center.x, 2) + Math.pow(snake.new_collision_circles[i].center.y - snake.snakeHead.center.y, 2))
-            if (distanceBetweenCircles >= snake.snakeHead.radius * 2) {
-                quadTreeBase.insertPoint(snake.new_collision_circles[i].center)
-                snake.new_collision_circles.splice(i, 1);
-                return true;
-            }
-        }
+        snake.bodies_for_collision=[]
+
+        /*snake.bodies_for_collision = [];
+        let collision_points : Array<Circle> = [];
+        quadTreeBase.haveCollision(snake.snakeHead, collision_points) 
+        if (collision_points.length != snake.bodies_not_check_for_collision.length) {
+            snake.speed = 1;
+        }*/
+        
+     
     }
 
 

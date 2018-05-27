@@ -20,8 +20,8 @@ let app = new Application({
     resolution: 1
 }
 );
-let play_field_width = 3000
-let play_field_height = 3000
+let play_field_width = 4000
+let play_field_height = 4000
 
 let pointBase = new Point(play_field_width / 2, play_field_height/2);
 let squareBase = new square(pointBase, Math.min(play_field_height,play_field_width)/2);
@@ -29,7 +29,7 @@ let squareBase = new square(pointBase, Math.min(play_field_height,play_field_wid
 document.body.appendChild(app.view);
 
 let snake = new Snake(squareBase)
-let renderSnake = new RenderSnake(app);
+let renderSnake = new RenderSnake(app, squareBase);
 new Keyboard(snake);
 
 let quadTreeBase = new Quadtree(squareBase,0)
@@ -55,8 +55,11 @@ function setup() {
 }
 
 function gameLoop(delta) {
+    if (delta > 1) {
+        console.log(delta)
+    }
     //console.time("update");
-    snake.UpdateDirections();
+    snake.UpdateDirections(delta);
     //console.timeEnd("update");
     //console.time("collision");
     quadTreeBase.updateCollision(snake);
